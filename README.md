@@ -18,9 +18,6 @@ from hikaxpro import HikAxPro
 axpro = HikAxPro("{host}", "{username}", "{password}")
 
 # returns 'True or False'
-axpro.connect()
-
-# returns 'True or False'
 axpro.arm_away()
 
 #returns 'True or False'
@@ -28,4 +25,6 @@ axpro.disarm()
 
 # returns 'True or False'
 axpro.arm_home()
+
+axpro.disarm()
 ```
