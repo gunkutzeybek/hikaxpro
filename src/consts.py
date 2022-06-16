@@ -1,6 +1,6 @@
 class Endpoints:
     Session_Capabilities = "/ISAPI/Security/sessionLogin/capabilities?username="
-    Session_Login = "/ISAPI/Security/sessionLogin="
+    Session_Login = "/ISAPI/Security/sessionLogin"
     Alarm_Disarm = "/ISAPI/SecurityCP/control/disarm/1"
     Alarm_ArmAway = "/ISAPI/SecurityCP/control/arm/1?ways=away"
     Alarm_ArmHome = "/ISAPI/SecurityCP/control/arm/1?ways=stay"
