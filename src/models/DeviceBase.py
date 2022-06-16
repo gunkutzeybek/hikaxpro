@@ -1,0 +1,17 @@
+class DeviceBase:
+    def __init__(self, prop_dict):
+        self.id = prop_dict["id"]
+        self.name = prop_dict["name"]
+        self.status = prop_dict["status"]
+        self.shielded = prop_dict["shielded"]
+        self.temperEvident = prop_dict["temperEvident"]
+        self.bypassed = prop_dict["bypassed"]
+        self.armed = prop_dict["armed"]
+        self.isArming = prop_dict["isArming"]
+        self.alarm = prop_dict["alarm"]
+        self.charge = prop_dict["charge"]
+        self.chargeValue = prop_dict["chargeValue"]
+        self.signal = prop_dict["signal"]
+        self.detectorType = prop_dict["detectorType"]
+        self.stayAway = prop_dict["stayAway"]
+        self.deviceNo = prop_dict["deviceNo"]
