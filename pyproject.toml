@@ -23,13 +23,14 @@ requires-python = ">=3.9"
 
 [project.optional-dependencies]
 dev = ["pytest", "requests_mock"]
+
 [tool.bumpver]
 current_version = "2022.1001-alpha"
 version_pattern = "YYYY.BUILD[-TAG]"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
 tag = true
-push = true
+push = false
 
 [tool.bumpver.file_patterns]
 "pyproject.toml" = [
@@ -39,15 +40,3 @@ push = true
     "{version}",
     "{pep440_version}",
 ]
-
-[tool.bumpver]
-current_version = "1.0.0"
-version_pattern = "MAJOR.MINOR.PATCH"
-commit_message  = "Bump version {old_version} -> {new_version}"
-commit          = true
-tag             = true
-push            = false
-
-[tool.bumpver.file_patterns]
-"pyproject.toml" = ['current_version = "{version}"', 'version = "{version}"']
-"src/__init__.py" = ["{version}"]
