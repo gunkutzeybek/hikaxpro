@@ -4,4 +4,4 @@ class IncorrectResponseContentError(Exception):
 
 class UnexpectedResponseCodeError(Exception):
     def __init__(self, responseCode, responseText):
-        super().__init__(f"Unexpected response status code {responceCode} returned with message {responseText}")
+        super().__init__(f"Unexpected response status code {responseCode} returned with message {responseText}")
