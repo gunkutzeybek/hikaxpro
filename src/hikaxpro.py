@@ -1,9 +1,11 @@
+
 from numpy import fromstring
 import requests
 import xml.etree.ElementTree as ET
 from src import consts
 from src.models import SessionLoginCap,SessionLogin
 from src.helpers import sha256, xmlBuilder
+from src.errors import errors
 from datetime import datetime
 
 
@@ -18,8 +20,11 @@ class HikAxPro:
     def getSessionParams(self):
         sessionResponse = requests.get(f"http://{self.host}{consts.Endpoints.Session_Capabilities}{self.username}")                            
         if sessionResponse.status_code == 200:
-            sessionCap = self.parseSessionResponse(sessionResponse.text)
-            return sessionCap
+            try:
+                sessionCap = self.parseSessionResponse(sessionResponse.text)
+                return sessionCap
+            except:
+                raise errors.IncorrectResponseContentError()
         else:
             return None
         
@@ -89,17 +94,26 @@ class HikAxPro:
         armEnpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_ArmHome}", True)
         response = self.makeRequest(armEnpoint, consts.Method.PUT)
 
+        if response.status_code != 200:
+            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
+
         return response.status_code == 200
 
     def arm_away(self):    
         armEnpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_ArmAway}", True)
         response = self.makeRequest(armEnpoint, consts.Method.PUT)
 
+        if response.status_code != 200:
+            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
+
         return response.status_code == 200
 
     def disarm(self):
         disarmEndpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_Disarm}", True)
         response = self.makeRequest(disarmEndpoint, consts.Method.PUT)
+
+        if response.status_code != 200:
+            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
 
         return response.status_code == 200
 
@@ -108,26 +122,38 @@ class HikAxPro:
         statusEndpoint = self.buildUrl(statusEndpoint, True)
         response = self.makeRequest(statusEndpoint, consts.Method.GET)
 
-        return response.status_code == 200
+        if response.status_code != 200:
+            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
+
+        return response.json()
 
     def periherals_status(self):
         peripheralsEndpoint = f"http://{self.host}{consts.Endpoints.PeripheralsStatus}"
         peripheralsEndpoint = self.buildUrl(peripheralsEndpoint, True)
         response = self.makeRequest(peripheralsEndpoint, consts.Method.GET)
 
-        return response.status_code == 200
+        if response.status_code != 200:
+            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
+
+        return response.json()
 
     def zone_status(self):
         zoneStatus = f"http://{self.host}{consts.Endpoints.ZoneStatus}"
         zoneStatus = self.buildUrl(zoneStatus, True)
         response = self.makeRequest(zoneStatus, consts.Method.GET)
     
-        return response.status_code == 200
+        if response.status_code != 200:
+            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
+
+        return response.json()
 
     def bypass_zone(self, zone_id):
         bypassZoneEndpoint = f"http://{self.host}{consts.Endpoints.BypassZone}{zone_id}"
         bypassZoneEndpoint = self.buildUrl(bypassZoneEndpoint, True)
         response = self.makeRequest(bypassZoneEndpoint, consts.Method.PUT)
+
+        if response.status_code != 200:
+            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
 
         return response.status_code == 200
 

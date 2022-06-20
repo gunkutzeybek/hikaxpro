@@ -121,23 +121,24 @@ def test_disarm(theaxpro, **kwargs):
 @requests_mock.Mocker(kw='mock')
 def test_subsystem_status(theaxpro, **kwargs):    
     url = f"http://{theaxpro.host}{consts.Endpoints.SubSystemStatus}"
-    kwargs["mock"].get(url, status_code=200)
+    kwargs["mock"].get(url, json={"SubSysList":[]}, status_code=200)
     result = theaxpro.subsystem_status()
-    assert result is True
+    assert ("SubSysList" in result) is True
 
 @requests_mock.Mocker(kw='mock')
-def test_peripherals_status(theaxpro, **kwargs):    
-    url = f"http://{theaxpro.host}{consts.Endpoints.PeripheralsStatus}"
-    kwargs["mock"].get(url, status_code=200)
+def test_peripherals_status_success(theaxpro, **kwargs):    
+    url = f"http://{theaxpro.host}{consts.Endpoints.PeripheralsStatus}"    
+    kwargs["mock"].get(url, json={ 'ExDevStatus': 'x'}, status_code=200)
     result = theaxpro.periherals_status()
-    assert result is True
+    assert ("ExDevStatus" in result) is True
 
 @requests_mock.Mocker(kw='mock')
-def test_zone_status(theaxpro, **kwargs):    
+def test_zone_status_success(theaxpro, **kwargs):    
     url = f"http://{theaxpro.host}{consts.Endpoints.ZoneStatus}"
-    kwargs["mock"].get(url, status_code=200)
+    responseJson = '{"ZoneList": []}'
+    kwargs["mock"].get(url, json=responseJson, status_code=200)
     result = theaxpro.zone_status()
-    assert result is True
+    assert ("ZoneList" in result) is True
 
 @requests_mock.Mocker(kw='mock')
 def test_bypass_zone(theaxpro, **kwargs):
