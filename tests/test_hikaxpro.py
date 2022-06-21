@@ -153,3 +153,10 @@ def test_recover_bypass_zone(theaxpro, **kwargs):
     kwargs["mock"].put(url, status_code=200)
     result = theaxpro.recover_bypass_zone(1)
     assert result is True
+
+@pytest.mark.skip(reason="Integration test. Requires actual credentials.")
+def test_get_interface_mac_address():
+    axpro = hikaxpro.HikAxPro('192.168.72.226', 'blabla@bla.com', 'blabla')
+    mac_address = axpro.get_interface_mac_address(1)
+
+    assert mac_address == '2c:a5:9c:cd:20:0a'

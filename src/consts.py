@@ -28,6 +28,7 @@ class Endpoints:
     ZoneStatus = "/ISAPI/SecurityCP/status/zones"
     BypassZone = "/ISAPI/SecurityCP/control/bypass/"
     RecoverBypassZone = "/ISAPI/SecurityCP/control/Recoverbypass/"
+    InterfaceInfo = "/ISAPI/System/Network/interfaces"
 
 class Method:
     GET = "GET"
@@ -36,3 +37,5 @@ class Method:
     DELETE = "DELETE"
 
 XML_SERIALIZABLE_NAMES = ["SessionLogin", "userName", "password", "sessionID", "sessionIDVersion"]
+
+XML_SCHEMA = "http://www.hikvision.com/ver20/XMLSchema"
