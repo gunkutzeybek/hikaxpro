@@ -30,7 +30,7 @@ class HikAxPro:
         
     def parseSessionResponse(self, xmlData):
         root = ET.fromstring(xmlData)
-        namespaces = {'xmlns': 'http://www.hikvision.com/ver20/XMLSchema'}
+        namespaces = {'xmlns': consts.XML_SCHEMA}
         sessionCap = SessionLoginCap.SessionLoginCap(
             root.find("xmlns:sessionID", namespaces).text,
             root.find("xmlns:challenge", namespaces).text,
@@ -163,6 +163,16 @@ class HikAxPro:
         response = self.makeRequest(recoverBypassZoneEndpoint, consts.Method.PUT)
 
         return response.status_code == 200
+
+    def get_interface_mac_address(self, interface_id):
+        interfacesEndpoint = f"http://{self.host}{consts.Endpoints.InterfaceInfo}"
+
+        response = self.makeRequest(interfacesEndpoint, consts.Method.GET)
+
+        if response.status_code == 200:
+            return xmlBuilder.get_mac_address_of_interface(response.text, interface_id)
+
+        return ''
 
     def makeRequest(self, endpoint, method, data=None):
         headers = {"Cookie": self.cookie}        
