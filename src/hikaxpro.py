@@ -174,22 +174,45 @@ class HikAxPro:
 
         return ''
 
-    def makeRequest(self, endpoint, method, data=None):
+    def get_area_arm_status(self, area_id):
+        armStatusEndpoint = f"http://{self.host}{consts.Endpoints.AreaArmStatus}"
+        armStatusEndpoint = self.buildUrl(armStatusEndpoint, True)
+        
+        data = {"SubSysList": [{"SubSys": {"id": area_id}}]}
+
+        response = self.makeRequest(armStatusEndpoint, consts.Method.POST, data = data, isJson = True)
+
+        try:
+            if response.status_code == 200:
+                responseJson = response.json()
+                return responseJson["ArmStatusList"][0]["ArmStatus"]["status"]
+        except:
+            return ''
+
+        return ''
+
+        
+
+    def makeRequest(self, endpoint, method, data=None, isJson = False):
         headers = {"Cookie": self.cookie}        
 
-        match method:
-            case consts.Method.GET:
-                response = requests.get(endpoint, headers=headers)
-            case consts.Method.POST:
+        if method == consts.Method.GET:
+            response = requests.get(endpoint, headers=headers)
+        elif method == consts.Method.POST:
+            if isJson:
+                response = requests.post(endpoint, json = data, headers=headers)
+            else:
                 response = requests.post(endpoint, data=data, headers=headers)
-            case consts.Method.PUT:
+        elif method == consts.Method.PUT:
+            if isJson:
+                response = requests.post(endpoint, json=data, headers=headers)
+            else:
                 response = requests.put(endpoint, data=data, headers=headers)
-            case _:
-                return None
+        else: return None
             
         if response.status_code == 401:
             self.connect()
-            response = self.makeRequest(endpoint, method, data)
+            response = self.makeRequest(endpoint, method, data, isJson)
 
         return response
     

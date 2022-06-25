@@ -29,6 +29,7 @@ class Endpoints:
     BypassZone = "/ISAPI/SecurityCP/control/bypass/"
     RecoverBypassZone = "/ISAPI/SecurityCP/control/Recoverbypass/"
     InterfaceInfo = "/ISAPI/System/Network/interfaces"
+    AreaArmStatus = "/ISAPI/SecurityCP/status/armStatus"
 
 class Method:
     GET = "GET"
