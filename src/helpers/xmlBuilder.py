@@ -1,4 +1,4 @@
-from src import consts
+import consts
 import xml.etree.ElementTree as ET
 
 def serializeObject(obj):
