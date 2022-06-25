@@ -2,10 +2,10 @@
 from numpy import fromstring
 import requests
 import xml.etree.ElementTree as ET
-from src import consts
-from src.models import SessionLoginCap,SessionLogin
-from src.helpers import sha256, xmlBuilder
-from src.errors import errors
+import consts
+from models import SessionLoginCap,SessionLogin
+from helpers import sha256, xmlBuilder
+from errors import errors
 from datetime import datetime
 
 
