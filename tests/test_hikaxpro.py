@@ -160,3 +160,10 @@ def test_get_interface_mac_address():
     mac_address = axpro.get_interface_mac_address(1)
 
     assert mac_address == '2c:a5:9c:cd:20:0a'
+
+@pytest.mark.skip(reason="Integration test. Requires actual credentials.")
+def test_get_area_arm_status():
+    axpro = hikaxpro.HikAxPro('192.168.72.226', 'blabla@bla.com', 'blabla')
+    status = axpro.get_area_arm_status(1)
+
+    assert status == 'disarmed'
