@@ -1,5 +1,4 @@
 
-from numpy import fromstring
 import requests
 import xml.etree.ElementTree as ET
 import consts
