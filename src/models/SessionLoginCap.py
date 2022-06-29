@@ -1,5 +1,3 @@
-import xml.etree.ElementTree as ET
-
 class SessionLoginCap:
     def __init__(self, sessionID, challange, salt, salt2, isIrreversible, iterations):
         self.sessionID = sessionID
