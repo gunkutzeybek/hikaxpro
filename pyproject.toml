@@ -16,7 +16,6 @@ classifiers = [
 ]
 keywords = ["hikvision", "ISAPI", "homeassistant"]
 dependencies = [
-    "numpy >= 1.22.3",
     "requests"    
 ]
 requires-python = ">=3.9"
