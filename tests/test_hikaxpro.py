@@ -7,7 +7,7 @@ from src import consts
 
 @pytest.fixture(scope="session")
 def theaxpro():
-    theaxpro = hikaxpro.HikAxPro("192.168.1.103", "blabla@blabla.com", "blablabla")
+    theaxpro = hikaxpro.HikAxPro("192.168.72.136", "blabla@blabla.com", "blabla")
     return theaxpro
 
 @requests_mock.Mocker(kw='mock')
@@ -104,6 +104,12 @@ def test_arm_home(theaxpro, **kwargs):
     result = theaxpro.arm_home()
     assert result is True
 
+@pytest.mark.skip(reason="Integration test. Requires actual credentials.")
+def test_arm_home_integration(theaxpro):
+    url = url = f"http://{theaxpro.host}{consts.Endpoints.Alarm_ArmHome}"
+    result = theaxpro.arm_home()
+    assert result is True
+
 @requests_mock.Mocker(kw='mock')
 def test_arm_away(theaxpro, **kwargs):    
     url = f"http://{theaxpro.host}{consts.Endpoints.Alarm_ArmAway}"
@@ -111,10 +117,22 @@ def test_arm_away(theaxpro, **kwargs):
     result = theaxpro.arm_away()
     assert result is True
 
+@pytest.mark.skip(reason="Integration test. Requires actual credentials.")
+def test_arm_away_integration(theaxpro):
+    url = f"http://{theaxpro.host}{consts.Endpoints.Alarm_ArmAway}"
+    result = theaxpro.arm_away()
+    assert result is True
+
 @requests_mock.Mocker(kw='mock')
 def test_disarm(theaxpro, **kwargs):    
     url = f"http://{theaxpro.host}{consts.Endpoints.Alarm_Disarm}"
     kwargs["mock"].put(url, status_code=200)
+    result = theaxpro.disarm()
+    assert result is True
+
+@pytest.mark.skip(reason="Integration test. Requires actual credentials.")
+def test_disarm_integration(theaxpro):
+    url = f"http://{theaxpro.host}{consts.Endpoints.Alarm_Disarm}"
     result = theaxpro.disarm()
     assert result is True
 
