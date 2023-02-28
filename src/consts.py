@@ -30,6 +30,9 @@ class Endpoints:
     RecoverBypassZone = "/ISAPI/SecurityCP/control/Recoverbypass/"
     InterfaceInfo = "/ISAPI/System/Network/interfaces"
     AreaArmStatus = "/ISAPI/SecurityCP/status/armStatus"
+    SirenStatus = "/ISAPI/SecurityCP/status/sirenStatus"
+    RepeaterStatus = "/ISAPI/SecurityCP/status/repeaterStatus"
+    KeypadStatus = "/ISAPI/SecurityCP/status/keypadStatus"
 
 
 class Method:
