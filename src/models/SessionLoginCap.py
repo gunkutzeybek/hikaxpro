@@ -1,8 +1,8 @@
 class SessionLoginCap:
-    def __init__(self, sessionID, challange, salt, salt2, isIrreversible, iterations):
-        self.sessionID = sessionID
-        self.challange = challange
+    def __init__(self, session_id, challenge, salt, salt2, is_irreversible, iteration):
+        self.sessionID = session_id
+        self.challenge = challenge
         self.salt = salt
         self.salt2 = salt2
-        self.isIrreversible = isIrreversible
-        self.iteration = iterations
+        self.is_irreversible = is_irreversible
+        self.iteration = iteration

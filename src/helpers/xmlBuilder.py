@@ -1,20 +1,22 @@
 import consts
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 
-def serializeObject(obj):
+
+def serialize_object(obj):
     result = f"<{type(obj).__name__}>"
     
-    for property, value in vars(obj).items():        
-        if property in consts.XML_SERIALIZABLE_NAMES:
-            result += f"<{property}>{value}</{property}>"
+    for prop, value in vars(obj).items():
+        if prop in consts.XML_SERIALIZABLE_NAMES:
+            result += f"<{prop}>{value}</{prop}>"
     
     result += f"</{type(obj).__name__}>"
 
     return result
 
-def get_mac_address_of_interface(xmlData, interface_id):
+
+def get_mac_address_of_interface(xml_data, interface_id):
     try:
-        root = ET.fromstring(xmlData)
+        root = ElementTree.fromstring(xml_data)
         namespaces = {'xmlns': consts.XML_SCHEMA}        
         for ni_element in root.findall('xmlns:NetworkInterface', namespaces):
             if ni_element.find('xmlns:id', namespaces).text == str(interface_id):

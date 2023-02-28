@@ -31,12 +31,15 @@ class Endpoints:
     InterfaceInfo = "/ISAPI/System/Network/interfaces"
     AreaArmStatus = "/ISAPI/SecurityCP/status/armStatus"
 
+
 class Method:
     GET = "GET"
     POST = "POST"
     PUT = "PUT"
     DELETE = "DELETE"
 
+
 XML_SERIALIZABLE_NAMES = ["SessionLogin", "userName", "password", "sessionID", "sessionIDVersion"]
+
 
 XML_SCHEMA = "http://www.hikvision.com/ver20/XMLSchema"

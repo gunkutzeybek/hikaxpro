@@ -25,7 +25,7 @@ def test_getSessionParams(theaxpro, **kwargs):
 
     kwargs["mock"].get(url, text=responseText, status_code=200)
 
-    sessionCap = theaxpro.getSessionParams()
+    sessionCap = theaxpro.get_session_params()
     assert sessionCap is not None
 
 def test_parseSessionResponse(theaxpro):
@@ -40,10 +40,10 @@ def test_parseSessionResponse(theaxpro):
                         <salt2>7BEB8CA39D05B89CABC4003FDCBA5AE73556CB8008BCEE3CBCA48CABC3AC201B</salt2>
                     </SessionLoginCap>"""
     
-    axProSession = theaxpro.parseSessionResponse(sessionXml)
+    axProSession = theaxpro.parse_session_response(sessionXml)
     
-    assert len(axProSession.sessionID) > 0
-    assert len(axProSession.challange) > 0
+    assert len(axProSession.session_id) > 0
+    assert len(axProSession.challenge) > 0
     assert len(axProSession.salt) > 0
     assert len(axProSession.salt2) > 0
 
@@ -55,7 +55,7 @@ def test_encodePassword_Irrevesible(theaxpro):
     salt2 = '7BEB8CA39D05B89CABC4003FDCBA5AE73556CB8008BCEE3CBCA48CABC3AC201B'
     sessionCap = SessionLoginCap.SessionLoginCap(sessionID, challange, salt, salt2, True, iteration)    
 
-    encodedPassword = theaxpro.encodePassword(sessionCap)
+    encodedPassword = theaxpro.encode_password(sessionCap)
 
     assert encodedPassword == "777b95a40f8b5b9ca25101d3c73168adb340f2001b611a74104c34352962d647"
 
@@ -67,7 +67,7 @@ def test_encodePassword_Not_Irreversible(theaxpro):
     salt2 = '7BEB8CA39D05B89CABC4003FDCBA5AE73556CB8008BCEE3CBCA48CABC3AC201B'
     sessionCap = SessionLoginCap.SessionLoginCap(sessionID, challange, salt, salt2, False, iteration)    
 
-    encodedPassword = theaxpro.encodePassword(sessionCap)
+    encodedPassword = theaxpro.encode_password(sessionCap)
     assert encodedPassword == "2b31a14ba59914a8e5e5510063e5d500ef322e76bc6c160df6a86b35c1e89ddd"
 
 @requests_mock.Mocker(kw='mock')
@@ -90,11 +90,11 @@ def test_connect_successfull(theaxpro, **kwargs):
     assert loginResult is True
 
 def test_buildUrl_json(theaxpro):    
-    url = theaxpro.buildUrl("http://blabla.com", True)
+    url = theaxpro.build_url("http://blabla.com", True)
     assert url == "http://blabla.com?format=json"
 
 def test_buildUrl_not_json(theaxpro):    
-    url = theaxpro.buildUrl("http://blabla.com", False)
+    url = theaxpro.build_url("http://blabla.com", False)
     assert url == "http://blabla.com"
 
 @requests_mock.Mocker(kw='mock')
@@ -147,7 +147,7 @@ def test_subsystem_status(theaxpro, **kwargs):
 def test_peripherals_status_success(theaxpro, **kwargs):    
     url = f"http://{theaxpro.host}{consts.Endpoints.PeripheralsStatus}"    
     kwargs["mock"].get(url, json={ 'ExDevStatus': 'x'}, status_code=200)
-    result = theaxpro.periherals_status()
+    result = theaxpro.peripherals_status()
     assert ("ExDevStatus" in result) is True
 
 @requests_mock.Mocker(kw='mock')
