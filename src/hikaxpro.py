@@ -195,6 +195,21 @@ class HikAxPro:
             return ''
         return ''
 
+    def host_status(self):
+        endpoint = f"http://{self.host}{consts.Endpoints.HostStatus}"
+        endpoint = self.build_url(endpoint, True)
+
+        response = self.make_request(endpoint, consts.Method.GET, is_json=True)
+
+        try:
+            if response.status_code == 200:
+                response_json = response.json()
+                return response_json
+        except:
+            return ''
+
+        return ''
+
     def make_request(self, endpoint, method, data=None, is_json=False):
         headers = {"Cookie": self.cookie}
 
