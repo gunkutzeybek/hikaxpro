@@ -1,3 +1,5 @@
+from typing import Optional
+
 import requests
 import xml.etree.ElementTree as ET
 import consts
@@ -88,8 +90,9 @@ class HikAxPro:
         paramPrefix = "&" if "?" in endpoint else "?"
         return (f"{endpoint}{paramPrefix}format=json" if isJson else endpoint)
 
-    def arm_home(self):        
-        armEnpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_ArmHome}", True)
+    def arm_home(self, sub_id: Optional[int]):
+        sid = "0xffffffff" if sub_id is None else str(sub_id)
+        armEnpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_ArmHome.replace('{}', sid)}", True)
         response = self.makeRequest(armEnpoint, consts.Method.PUT)
 
         if response.status_code != 200:
@@ -97,8 +100,9 @@ class HikAxPro:
 
         return response.status_code == 200
 
-    def arm_away(self):    
-        armEnpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_ArmAway}", True)
+    def arm_away(self, sub_id: Optional[int]):
+        sid = "0xffffffff" if sub_id is None else str(sub_id)
+        armEnpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_ArmAway.replace('{}', sid)}", True)
         response = self.makeRequest(armEnpoint, consts.Method.PUT)
 
         if response.status_code != 200:
@@ -106,8 +110,9 @@ class HikAxPro:
 
         return response.status_code == 200
 
-    def disarm(self):
-        disarmEndpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_Disarm}", True)
+    def disarm(self, sub_id: Optional[int]):
+        sid = "0xffffffff" if sub_id is None else str(sub_id)
+        disarmEndpoint = self.buildUrl(f"http://{self.host}{consts.Endpoints.Alarm_Disarm.replace('{}', sid)}", True)
         response = self.makeRequest(disarmEndpoint, consts.Method.PUT)
 
         if response.status_code != 200:
