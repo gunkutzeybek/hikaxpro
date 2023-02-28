@@ -92,55 +92,35 @@ class HikAxPro:
         param_prefix = "&" if "?" in endpoint else "?"
         return f"{endpoint}{param_prefix}format=json" if is_json else endpoint
 
-    def arm_home(self, sub_id: Optional[int]):
-        sid = "0xffffffff" if sub_id is None else str(sub_id)
-        endpoint = self.build_url(f"http://{self.host}{consts.Endpoints.Alarm_ArmHome.replace('{}', sid)}", True)
-        response = self.make_request(endpoint, consts.Method.PUT)
+    def _base_json_request(self, url: str, method: consts.Method = consts.Method.GET):
+        endpoint = self.build_url(url, True)
+        response = self.make_request(endpoint, method, is_json=True)
 
         if response.status_code != 200:
             raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
+        if response.status_code == 200:
+            return response.json()
 
-        return response.status_code == 200
+    def arm_home(self, sub_id: Optional[int]):
+        sid = "0xffffffff" if sub_id is None else str(sub_id)
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.Alarm_ArmHome.replace('{}', sid)}",
+                                       method=consts.Method.PUT)
 
     def arm_away(self, sub_id: Optional[int]):
         sid = "0xffffffff" if sub_id is None else str(sub_id)
-        endpoint = self.build_url(f"http://{self.host}{consts.Endpoints.Alarm_ArmAway.replace('{}', sid)}", True)
-        response = self.make_request(endpoint, consts.Method.PUT)
-
-        if response.status_code != 200:
-            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
-
-        return response.status_code == 200
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.Alarm_ArmAway.replace('{}', sid)}",
+                                       method=consts.Method.PUT)
 
     def disarm(self, sub_id: Optional[int]):
         sid = "0xffffffff" if sub_id is None else str(sub_id)
-        endpoint = self.build_url(f"http://{self.host}{consts.Endpoints.Alarm_Disarm.replace('{}', sid)}", True)
-        response = self.make_request(endpoint, consts.Method.PUT)
-
-        if response.status_code != 200:
-            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
-
-        return response.status_code == 200
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.Alarm_Disarm.replace('{}', sid)}",
+                                       method=consts.Method.PUT)
 
     def subsystem_status(self):
-        endpoint = f"http://{self.host}{consts.Endpoints.SubSystemStatus}"
-        endpoint = self.build_url(endpoint, True)
-        response = self.make_request(endpoint, consts.Method.GET)
-
-        if response.status_code != 200:
-            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
-
-        return response.json()
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.SubSystemStatus}")
 
     def peripherals_status(self):
-        endpoint = f"http://{self.host}{consts.Endpoints.PeripheralsStatus}"
-        endpoint = self.build_url(endpoint, True)
-        response = self.make_request(endpoint, consts.Method.GET)
-
-        if response.status_code != 200:
-            raise errors.UnexpectedResponseCodeError(response.status_code, response.text)
-
-        return response.json()
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.PeripheralsStatus}")
 
     def zone_status(self):
         endpoint = f"http://{self.host}{consts.Endpoints.ZoneStatus}"
@@ -196,64 +176,16 @@ class HikAxPro:
         return ''
 
     def host_status(self):
-        endpoint = f"http://{self.host}{consts.Endpoints.HostStatus}"
-        endpoint = self.build_url(endpoint, True)
-
-        response = self.make_request(endpoint, consts.Method.GET, is_json=True)
-
-        try:
-            if response.status_code == 200:
-                response_json = response.json()
-                return response_json
-        except:
-            return ''
-
-        return ''
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.HostStatus}")
 
     def siren_status(self):
-        endpoint = f"http://{self.host}{consts.Endpoints.SirenStatus}"
-        endpoint = self.build_url(endpoint, True)
-
-        response = self.make_request(endpoint, consts.Method.GET, is_json=True)
-
-        try:
-            if response.status_code == 200:
-                response_json = response.json()
-                return response_json
-        except:
-            return ''
-
-        return ''
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.SirenStatus}")
 
     def keypad_status(self):
-        endpoint = f"http://{self.host}{consts.Endpoints.KeypadStatus}"
-        endpoint = self.build_url(endpoint, True)
-
-        response = self.make_request(endpoint, consts.Method.GET, is_json=True)
-
-        try:
-            if response.status_code == 200:
-                response_json = response.json()
-                return response_json
-        except:
-            return ''
-
-        return ''
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.KeypadStatus}")
 
     def repeater_status(self):
-        endpoint = f"http://{self.host}{consts.Endpoints.RepeaterStatus}"
-        endpoint = self.build_url(endpoint, True)
-
-        response = self.make_request(endpoint, consts.Method.GET, is_json=True)
-
-        try:
-            if response.status_code == 200:
-                response_json = response.json()
-                return response_json
-        except:
-            return ''
-
-        return ''
+        return self._base_json_request(f"http://{self.host}{consts.Endpoints.RepeaterStatus}")
 
     def make_request(self, endpoint, method, data=None, is_json=False):
         headers = {"Cookie": self.cookie}
