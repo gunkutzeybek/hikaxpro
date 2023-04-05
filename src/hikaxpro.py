@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any, Union
 
 import requests
 from xml.etree import ElementTree
@@ -7,6 +7,11 @@ from models import SessionLoginCap, SessionLogin
 from helpers import sha256, xmlBuilder
 from errors import errors
 from datetime import datetime
+import logging
+import urllib.parse
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class HikAxPro:
@@ -19,7 +24,18 @@ class HikAxPro:
         self.cookie = ''
 
     def get_session_params(self):
-        response = requests.get(f"http://{self.host}{consts.Endpoints.Session_Capabilities}{self.username}")
+        q_user = urllib.parse.quote(self.username)
+        # q_password = urllib.parse.quote(self.password)
+        # TODO needs basic auth ?
+        # response = \
+        #  requests.get(f"http://{q_user}:{q_password}@{self.host}{consts.Endpoints.Session_Capabilities}{q_user}")
+        response = requests.get(f"http://{self.host}{consts.Endpoints.Session_Capabilities}{q_user}")
+        _LOGGER.debug("Session_Capabilities response")
+        _LOGGER.debug("Status: %s", response.status_code)
+        _LOGGER.debug("Content: %s", response.content)
+        _LOGGER.debug("Text: %s", response.text)
+        _LOGGER.debug("Headers: %s", response.headers)
+        _LOGGER.debug("End Session_Capabilities response")
         if response.status_code == 200:
             try:
                 session_cap = self.parse_session_response(response.text)
@@ -30,31 +46,52 @@ class HikAxPro:
             return None
 
     @staticmethod
+    def set_logging_level(level: Union[int, str]):
+        _LOGGER.setLevel(level)
+
+    @staticmethod
+    def _root_get_value(root: ElementTree, ns: dict, key: str, default: Optional[Any] = None) -> Optional[Any]:
+        item = root.find(key, ns)
+        if item is not None:
+            return item.text
+        return default
+
+    @staticmethod
     def parse_session_response(xml_data):
+        _LOGGER.debug("Debug data %s", xml_data)
         root = ElementTree.fromstring(xml_data)
         namespaces = {'xmlns': consts.XML_SCHEMA}
+
+        session_id = HikAxPro._root_get_value(root, namespaces, "xmlns:sessionID")
+        challenge = HikAxPro._root_get_value(root, namespaces, "xmlns:challenge")
+        salt = HikAxPro._root_get_value(root, namespaces, "xmlns:salt")
+        salt2 = HikAxPro._root_get_value(root, namespaces, "xmlns:salt2")
+        is_irreversible = HikAxPro._root_get_value(root, namespaces, "xmlns:isIrreversible", False)
+        iterations = HikAxPro._root_get_value(root, namespaces, "xmlns:iterations")
+        if iterations is not None:
+            iterations = int(iterations)
         session_cap = SessionLoginCap.SessionLoginCap(
-            root.find("xmlns:sessionID", namespaces).text,
-            root.find("xmlns:challenge", namespaces).text,
-            root.find("xmlns:salt", namespaces).text,
-            root.find("xmlns:salt2", namespaces).text,
-            root.find("xmlns:isIrreversible", namespaces).text,
-            int(root.find("xmlns:iterations", namespaces).text)
+            session_id=session_id,
+            challenge=challenge,
+            salt=salt,
+            salt2=salt2,
+            is_irreversible=is_irreversible,
+            iterations=iterations
         )
         return session_cap
 
-    def encode_password(self, session_cap):
+    def encode_password(self, session_cap: SessionLoginCap.SessionLoginCap):
         if session_cap.is_irreversible:
             result = sha256.sha256(f"{self.username}{session_cap.salt}{self.password}")
             result = sha256.sha256(f"{self.username}{session_cap.salt2}{result}")
             result = sha256.sha256(f"{result}{session_cap.challenge}")
 
-            for i in range(2, session_cap.iteration):
+            for i in range(2, session_cap.iterations):
                 result = sha256.sha256(result)
         else:
             result = f"{sha256.sha256(self.password)}{session_cap.challenge}"
 
-            for i in range(1, session_cap.iteration):
+            for i in range(1, session_cap.iterations):
                 result = sha256.sha256(result)
 
         return result
@@ -66,7 +103,7 @@ class HikAxPro:
 
         xml = xmlBuilder.serialize_object(
             SessionLogin.SessionLogin(
-                params.sessionID,
+                params.session_id,
                 self.username,
                 encoded_password
             )
@@ -77,18 +114,37 @@ class HikAxPro:
         session_login_url = f"http://{self.host}{consts.Endpoints.Session_Login}?timeStamp={int(timestamp)}"
         result = False
         try:
-            login_response = requests.post(session_login_url, xml)
-
+            login_response: requests.Response = requests.post(session_login_url, xml)
+            _LOGGER.debug("Connect response")
+            _LOGGER.debug("Status: %s", login_response.status_code)
+            _LOGGER.debug("Content: %s", login_response.content)
+            _LOGGER.debug("Text: %s", login_response.text)
+            _LOGGER.debug("Headers: %s", login_response.headers)
+            _LOGGER.debug("End connect response")
             if login_response.status_code == 200:
-                self.cookie = login_response.headers["Set-Cookie"].split(";")[0]
+                cookie = login_response.headers.get("Set-Cookie")
+                if cookie is None:
+                    root = ElementTree.fromstring(login_response.text)
+                    namespaces = {'xmlns': consts.XML_SCHEMA}
+                    session_id = HikAxPro._root_get_value(root, namespaces, "xmlns:sessionID")
+                    if session_id is not None:
+                        cookie = "WebSession=" + session_id
+                else:
+                    self.cookie = cookie.split(";")[0]
+
+                if cookie is None:
+                    raise Exception("No cookie provided")
+
+                self.cookie = cookie
                 result = True
-        except:
+        except Exception as e:
+            _LOGGER.error("Error in parsing response", exc_info=e)
             result = False
 
         return result
 
     @staticmethod
-    def build_url(endpoint, is_json):
+    def build_url(endpoint: str, is_json: bool = False):
         param_prefix = "&" if "?" in endpoint else "?"
         return f"{endpoint}{param_prefix}format=json" if is_json else endpoint
 
@@ -101,17 +157,17 @@ class HikAxPro:
         if response.status_code == 200:
             return response.json()
 
-    def arm_home(self, sub_id: Optional[int]):
+    def arm_home(self, sub_id: Optional[int] = None):
         sid = "0xffffffff" if sub_id is None else str(sub_id)
         return self._base_json_request(f"http://{self.host}{consts.Endpoints.Alarm_ArmHome.replace('{}', sid)}",
                                        method=consts.Method.PUT)
 
-    def arm_away(self, sub_id: Optional[int]):
+    def arm_away(self, sub_id: Optional[int] = None):
         sid = "0xffffffff" if sub_id is None else str(sub_id)
         return self._base_json_request(f"http://{self.host}{consts.Endpoints.Alarm_ArmAway.replace('{}', sid)}",
                                        method=consts.Method.PUT)
 
-    def disarm(self, sub_id: Optional[int]):
+    def disarm(self, sub_id: Optional[int] = None):
         sid = "0xffffffff" if sub_id is None else str(sub_id)
         return self._base_json_request(f"http://{self.host}{consts.Endpoints.Alarm_Disarm.replace('{}', sid)}",
                                        method=consts.Method.PUT)
