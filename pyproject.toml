@@ -7,7 +7,10 @@ name = "hikaxpro"
 version = "1.3.0"
 description = "Hikvision AX Pro alarm kit ISAPI integration for home assistant alarm panel"
 readme = "README.md"
-authors = [{ name = "Günkut Zeybek", email = "gunkut.zeybek@gmail.com" }]
+authors = [
+    { name = "Günkut Zeybek", email = "gunkut.zeybek@gmail.com" },
+    { name = "Petr Leo Compel", email = "petrleocompel@gmail.com" }
+]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -26,7 +29,7 @@ dev = ["pytest", "requests_mock"]
 [tool.bumpver]
 current_version = "1.3.0"
 version_pattern = "MAJOR.MINOR.PATCH"
-commit_message = "bump version {old_version} -> {new_version}"
+commit_message = "chore: release version {new_version}"
 commit = true
 tag = true
 push = false
